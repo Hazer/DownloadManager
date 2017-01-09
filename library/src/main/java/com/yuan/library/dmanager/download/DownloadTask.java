@@ -98,7 +98,11 @@ public class DownloadTask implements Runnable {
 
             long completedSize = mTaskEntity.getCompletedSize();
 
-            if (completedSize == mTaskEntity.getTotalSize()) {
+            if (tempFile.length() == 0) {
+                completedSize = 0;
+            }
+
+            if (completedSize != 0 && completedSize == mTaskEntity.getTotalSize()) {
                 handler.sendEmptyMessage(TaskStatus.TASK_STATUS_DOWNLOADING);
                 mTaskEntity.setTaskStatus(TaskStatus.TASK_STATUS_FINISH);
                 handler.sendEmptyMessage(TaskStatus.TASK_STATUS_FINISH);
@@ -108,9 +112,6 @@ public class DownloadTask implements Runnable {
 
             Request request = new Request.Builder().url(mTaskEntity.getUrl()).header("RANGE", "bytes=" + completedSize + "-").build();
 
-            if (tempFile.length() == 0) {
-               completedSize = 0;
-            }
             tempFile.seek(completedSize);
 
             Response response = mClient.newCall(request).execute();
